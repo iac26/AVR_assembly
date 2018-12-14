@@ -1,0 +1,67 @@
+
+AVRA   Ver. 1.3.0 blink.asm Fri Dec 14 14:05:17 2018
+
+
+         ;blink.asm
+         ;blinker program using timers
+         ;connect led between pb2 (d10) and gnd
+         
+         
+          .list
+         
+          .org	0x0000			;reset int vector
+C:000000 c020      	rjmp	Reset
+          .org	0x0020			;timer0 overflow int vector
+C:000020 c010      	rjmp	overflow_h
+         
+          Reset:	
+C:000021 e005      	ldi 	r16, 0b00000101
+C:000022 bd05      	out	TCCR0B, r16
+C:000023 e001      	ldi	r16, 0b00000001
+C:000024 9300 006e 	sts	TIMSK0, r16
+C:000026 9478      	sei
+C:000027 2700      	clr	r16
+C:000028 bd06      	out	TCNT0, r16
+C:000029 9a22      	sbi	DDRB, 2
+          blink:
+C:00002a 9a2a      	sbi 	PortB, 2
+C:00002b e033      	ldi	r19, 3
+C:00002c d00a      	rcall	delay
+C:00002d 982a      	cbi 	PortB, 2
+C:00002e e031      	ldi	r19, 1
+C:00002f d007      	rcall	delay
+C:000030 cff9      	rjmp	blink
+         
+         
+          overflow_h:
+C:000031 9513      	inc 	r17
+C:000032 311e      	cpi	r17, 30
+C:000033 f411      	brne 	overflow_r
+C:000034 2711      	clr	r17
+C:000035 9523      	inc 	r18
+          overflow_r:
+C:000036 9518      	reti
+         
+         
+          delay:
+C:000037 2722      	clr 	r18
+          cnt:	
+C:000038 1723      	cp 	r18, r19
+C:000039 f7f1      	brne	cnt
+C:00003a 9508      	ret
+         
+         
+         
+         
+         
+         
+         
+         
+
+
+Segment usage:
+   Code      :        28 words (56 bytes)
+   Data      :         0 bytes
+   EEPROM    :         0 bytes
+
+Assembly completed with no errors.
